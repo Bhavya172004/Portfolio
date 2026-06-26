@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bhavya — Data Analyst Portfolio</title>
+<meta name="description" content="Bhavya Trivedi — Data Analyst. SQL, Python, Power BI, ML, NLP & dashboard development." />
+
+<!-- Fonts: Space Grotesk (display) + Inter (body) + JetBrains Mono (data/utility) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Tailwind CSS (CDN, JIT) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          base: {
+            DEFAULT: '#0B0F19',
+            soft: '#0E1320',
+            card: '#11172A',
+          },
+          indigo: {
+            glow: '#6366F1',
+          },
+          cyan: {
+            glow: '#22D3EE',
+          },
+          violet: {
+            glow: '#A78BFA',
+          },
+        },
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          body: ['Inter', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        },
+        boxShadow: {
+          'glow-sm': '0 0 20px -4px rgba(99,102,241,0.35)',
+          'glow-md': '0 0 40px -8px rgba(99,102,241,0.45)',
+          'glow-cyan': '0 0 30px -6px rgba(34,211,238,0.4)',
+        },
+      },
+    },
+  }
+</script>
+
+<style>
+  /* ============================================================
+     BASE / RESET
+     ============================================================ */
+  * { scroll-behavior: smooth; }
+  html { scroll-padding-top: 90px; }
+
+  body {
+    background-color: #0B0F19;
+    font-family: 'Inter', sans-serif;
+    color: #E5E7EB;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: #6366F1; color: #fff; }
+
+  /* Respect reduced motion preference across all custom animations */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* ============================================================
+     SCROLLBAR
+     ============================================================ */
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: #0B0F19; }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #6366F1, #22D3EE);
+    border-radius: 10px;
+  }
+
+  /* ============================================================
+     SIGNATURE BACKGROUND: data-grid + node field
+     A faint engineered grid with drifting "data node" particles,
+     evoking a pipeline / schema canvas. This is the visual thesis
+     of the page: data quietly moving in the background at all times.
+     ============================================================ */
+  .grid-field {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, rgba(99,102,241,0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(99,102,241,0.06) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+  }
+
+  .ambient-glow {
+    position: fixed;
+    border-radius: 9999px;
+    filter: blur(120px);
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.35;
+  }
+
+  /* ============================================================
+     SCROLL PROGRESS BAR
+     ============================================================ */
+  #scroll-progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, #6366F1, #22D3EE);
+    z-index: 100;
+    box-shadow: 0 0 12px rgba(34,211,238,0.6);
+    transition: width 0.1s ease-out;
+  }
+
+  /* ============================================================
+     GLASSMORPHISM CARD
+     ============================================================ */
+  .glass {
+    background: rgba(17, 23, 42, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(148, 163, 184, 0.08);
+  }
+
+  .glass-strong {
+    background: rgba(17, 23, 42, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+  }
+
+  /* ============================================================
+     NAV
+     ============================================================ */
+  #navbar {
+    transition: background-color 0.4s ease, border-color 0.4s ease, padding 0.3s ease;
+  }
+  #navbar.scrolled {
+    background: rgba(11, 15, 25, 0.7);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(148,163,184,0.08);
+  }
+
+  .nav-link {
+    position: relative;
+    color: #9CA3AF;
+    transition: color 0.25s ease;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0; bottom: -4px;
+    width: 0%;
+    height: 1.5px;
+    background: linear-gradient(90deg, #6366F1, #22D3EE);
+    transition: width 0.3s ease;
+  }
+  .nav-link:hover { color: #F3F4F6; }
+  .nav-link:hover::after { width: 100%; }
+  .nav-link.active { color: #fff; }
+  .nav-link.active::after { width: 100%; }
+
+  /* ============================================================
+     TYPOGRAPHY HELPERS
+     ============================================================ */
+  .gradient-text {
+    background: linear-gradient(90deg, #818CF8 0%, #6366F1 35%, #22D3EE 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    color: #22D3EE;
+  }
+
+  .eyebrow::before {
+    content: '// ';
+    color: #6366F1;
+  }
+
+  /* ============================================================
+     HERO: typing effect cursor
+     ============================================================ */
+  #typed-role::after {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 1em;
+    background: #22D3EE;
+    margin-left: 4px;
+    vertical-align: -0.1em;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* Floating animation for hero accent shapes */
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    50% { transform: translateY(-18px) translateX(8px); }
+  }
+  .float-slow { animation: float-slow 7s ease-in-out infinite; }
+  .float-slow-delay { animation: float-slow 9s ease-in-out infinite 1.5s; }
+
+  /* Orbiting node ring around hero portrait/badge */
+  @keyframes spin-slow { to { transform: rotate(360deg); } }
+  .spin-slow { animation: spin-slow 24s linear infinite; }
+  .spin-reverse { animation: spin-slow 18s linear infinite reverse; }
+
+  /* ============================================================
+     SCROLL REVEAL (fade-up)
+     ============================================================ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.08s; }
+  .reveal-delay-2 { transition-delay: 0.16s; }
+  .reveal-delay-3 { transition-delay: 0.24s; }
+  .reveal-delay-4 { transition-delay: 0.32s; }
+
+  /* ============================================================
+     CARD HOVER (project + general cards)
+     ============================================================ */
+  .lift-card {
+    transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s ease, border-color 0.35s ease;
+  }
+  .lift-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(99,102,241,0.4);
+    box-shadow: 0 20px 50px -15px rgba(99,102,241,0.25), 0 0 0 1px rgba(99,102,241,0.1);
+  }
+
+  /* Skill bar fill animation */
+  .skill-bar-fill {
+    width: 0%;
+    transition: width 1.4s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  /* Button micro-interaction */
+  .btn-primary {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -8px rgba(99,102,241,0.55); }
+  .btn-primary:active { transform: translateY(0px) scale(0.98); }
+
+  .btn-ghost {
+    transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
+  }
+  .btn-ghost:hover { transform: translateY(-2px); border-color: rgba(34,211,238,0.5); background-color: rgba(34,211,238,0.06); }
+  .btn-ghost:active { transform: translateY(0px) scale(0.98); }
+
+  /* Focus visibility (accessibility) */
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid #22D3EE;
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* ============================================================
+     TIMELINE (Experience / Learning Journey)
+     ============================================================ */
+  .timeline-line {
+    background: linear-gradient(180deg, #6366F1 0%, #22D3EE 50%, rgba(34,211,238,0.1) 100%);
+  }
+  .timeline-dot {
+    box-shadow: 0 0 0 4px rgba(11,15,25,1), 0 0 16px rgba(99,102,241,0.8);
+  }
+
+  /* ============================================================
+     MARQUEE for tech/tool strip
+     ============================================================ */
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .marquee-track {
+    animation: marquee 30s linear infinite;
+  }
+  .marquee-wrap:hover .marquee-track { animation-play-state: paused; }
+
+  /* ============================================================
+     LOADING SCREEN
+     ============================================================ */
+  #loader {
+    position: fixed; inset: 0; z-index: 200;
+    background: #0B0F19;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+  }
+  #loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+  .loader-bar {
+    width: 220px; height: 2px;
+    background: rgba(148,163,184,0.15);
+    overflow: hidden;
+    position: relative;
+    border-radius: 2px;
+  }
+  .loader-bar::after {
+    content: '';
+    position: absolute; top: 0; left: -40%;
+    width: 40%; height: 100%;
+    background: linear-gradient(90deg, transparent, #6366F1, #22D3EE, transparent);
+    animation: loader-sweep 1.1s ease-in-out infinite;
+  }
+  @keyframes loader-sweep {
+    0% { left: -40%; }
+    100% { left: 100%; }
+  }
+
+  /* Project card skeleton shimmer (used while GitHub API loads) */
+  .skeleton {
+    background: linear-gradient(90deg, rgba(148,163,184,0.06) 25%, rgba(148,163,184,0.12) 37%, rgba(148,163,184,0.06) 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.6s ease infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Back to top button */
+  #back-to-top {
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  }
+
+  /* Language color dots for repo cards */
+  .lang-dot { width: 8px; height: 8px; border-radius: 9999px; display: inline-block; }
+</style>
+</head>
+
+<body class="bg-base text-gray-200 antialiased font-body">
+
+  <!-- ============================================================
+       LOADING SCREEN — shown briefly on first paint
+       ============================================================ -->
+  <div id="loader" aria-hidden="true">
+    <div class="flex flex-col items-center gap-5">
+      <div class="font-display text-xl tracking-wide text-white">
+        <span class="gradient-text">Bhavya</span><span class="text-gray-600">.dev</span>
+      </div>
+      <div class="loader-bar"></div>
+      <p class="eyebrow">compiling dataset</p>
+    </div>
+  </div>
+
+  <!-- Scroll progress bar -->
+  <div id="scroll-progress"></div>
+
+  <!-- Signature ambient background -->
+  <div class="grid-field"></div>
+  <div class="ambient-glow bg-indigo-glow w-[480px] h-[480px] -top-40 -left-32"></div>
+  <div class="ambient-glow bg-cyan-glow w-[420px] h-[420px] top-[40%] -right-40"></div>
+  <div class="ambient-glow bg-violet-glow w-[380px] h-[380px] bottom-0 left-1/3"></div>
+
+  <!-- ============================================================
+       NAVBAR
+       ============================================================ -->
+  <header id="navbar" class="fixed top-0 inset-x-0 z-50">
+    <nav class="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between h-20">
+      <a href="#home" class="font-display text-lg font-semibold text-white flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-indigo-glow to-cyan-glow shadow-glow-sm"></span>
+        Bhavya<span class="text-gray-500">.dev</span>
+      </a>
+
+      <ul class="hidden md:flex items-center gap-9 text-sm font-medium">
+        <li><a href="#about" class="nav-link" data-nav>About</a></li>
+        <li><a href="#skills" class="nav-link" data-nav>Skills</a></li>
+        <li><a href="#projects" class="nav-link" data-nav>Projects</a></li>
+        <li><a href="#journey" class="nav-link" data-nav>Journey</a></li>
+        <li><a href="#contact" class="nav-link" data-nav>Contact</a></li>
+      </ul>
+
+      <div class="hidden md:flex items-center gap-3">
+        <a href="https://github.com/Bhavya172004" target="_blank" rel="noopener"
+           class="btn-ghost text-sm font-medium px-4 py-2 rounded-lg border border-gray-700 text-gray-200">
+          GitHub ↗
+        </a>
+        <a href="#contact"
+           class="btn-primary text-sm font-semibold px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-glow to-cyan-glow text-white shadow-glow-sm">
+          Let's talk
+        </a>
+      </div>
+
+      <!-- Mobile menu toggle -->
+      <button id="menu-toggle" aria-label="Toggle menu" aria-expanded="false" class="md:hidden text-gray-200 p-2">
+        <svg id="icon-open" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg id="icon-close" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </nav>
+
+    <!-- Mobile menu panel -->
+    <div id="mobile-menu" class="md:hidden hidden glass-strong border-t border-gray-800">
+      <ul class="flex flex-col px-6 py-4 gap-1 text-sm font-medium">
+        <li><a href="#about" class="block py-3 nav-link" data-nav>About</a></li>
+        <li><a href="#skills" class="block py-3 nav-link" data-nav>Skills</a></li>
+        <li><a href="#projects" class="block py-3 nav-link" data-nav>Projects</a></li>
+        <li><a href="#journey" class="block py-3 nav-link" data-nav>Journey</a></li>
+        <li><a href="#contact" class="block py-3 nav-link" data-nav>Contact</a></li>
+        <li class="pt-3 flex gap-3">
+          <a href="https://github.com/Bhavya172004" target="_blank" rel="noopener" class="flex-1 text-center btn-ghost text-sm font-medium px-4 py-2.5 rounded-lg border border-gray-700">GitHub ↗</a>
+          <a href="#contact" class="flex-1 text-center btn-primary text-sm font-semibold px-4 py-2.5 rounded-lg bg-gradient-to-r from-indigo-glow to-cyan-glow text-white">Let's talk</a>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="relative z-10">
+
+    <!-- ============================================================
+         HERO SECTION
+         ============================================================ -->
+    <section id="home" class="relative min-h-screen flex items-center pt-32 pb-20 px-6 lg:px-10">
+      <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-12 items-center">
+
+        <div class="lg:col-span-7">
+          <p class="eyebrow mb-5 opacity-0 animate-[fadeIn_0.8s_ease_0.2s_forwards]" style="animation-fill-mode:forwards;">available for opportunities</p>
+
+          <h1 class="font-display text-[2.6rem] leading-[1.08] sm:text-6xl lg:text-[4.2rem] font-semibold text-white tracking-tight">
+            Turning raw data
+            <br class="hidden sm:block" />
+            into <span class="gradient-text">clear decisions.</span>
+          </h1>
+
+          <div class="mt-6 font-mono text-base sm:text-lg text-gray-400 h-7">
+            <span class="text-cyan-glow">$</span> <span id="typed-role"></span>
+          </div>
+
+          <p class="mt-7 text-gray-400 text-lg leading-relaxed max-w-xl">
+            I'm <span class="text-white font-medium">Bhavya</span>, a Data Analyst who finds the story hiding inside spreadsheets and pipelines — then builds the SQL, dashboards, and visuals to tell it clearly.
+          </p>
+
+          <div class="mt-10 flex flex-wrap items-center gap-4">
+            <a href="#projects" class="btn-primary inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-indigo-glow to-cyan-glow text-white font-semibold text-sm shadow-glow-md">
+              View Projects
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            </a>
+            <a href="https://github.com/Bhavya172004" target="_blank" rel="noopener" class="btn-ghost inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border border-gray-700 text-gray-100 font-semibold text-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.27-.01-1-.02-1.96-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.24 2.75.12 3.04.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.15 0 1.55-.01 2.8-.01 3.18 0 .31.21.67.8.56A10.52 10.52 0 0 0 23.5 12c0-6.35-5.15-11.5-11.5-11.5z"/></svg>
+              GitHub Profile
+            </a>
+          </div>
+
+          <!-- Quick stat strip -->
+          <dl class="mt-14 grid grid-cols-3 max-w-md gap-6 border-t border-gray-800 pt-7">
+            <div>
+              <dt class="eyebrow !text-gray-500">repos</dt>
+              <dd id="stat-repos" class="font-display text-2xl text-white mt-1">—</dd>
+            </div>
+            <div>
+              <dt class="eyebrow !text-gray-500">certifications</dt>
+              <dd class="font-display text-2xl text-white mt-1">5</dd>
+            </div>
+            <div>
+              <dt class="eyebrow !text-gray-500">focus</dt>
+              <dd class="font-display text-2xl text-white mt-1">BI · SQL</dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- Hero visual: orbiting "schema" badge -->
+        <div class="lg:col-span-5 relative hidden lg:flex justify-center items-center">
+          <div class="relative w-[380px] h-[380px]">
+            <div class="absolute inset-0 rounded-full border border-indigo-glow/20 spin-slow"></div>
+            <div class="absolute inset-8 rounded-full border border-cyan-glow/20 spin-reverse"></div>
+
+            <!-- orbiting nodes -->
+            <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-cyan-glow shadow-glow-cyan float-slow"></div>
+            <div class="absolute bottom-2 right-2 w-3 h-3 rounded-full bg-indigo-glow shadow-glow-sm float-slow-delay"></div>
+            <div class="absolute top-1/3 -left-3 w-2.5 h-2.5 rounded-full bg-violet-glow float-slow-delay"></div>
+
+            <div class="absolute inset-16 rounded-3xl glass-strong shadow-glow-md flex flex-col justify-center px-7 py-8">
+              <div class="flex items-center gap-2 mb-5">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-400/70"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-400/70"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-green-400/70"></span>
+                <span class="ml-auto font-mono text-[10px] text-gray-500">query.sql</span>
+              </div>
+              <pre class="font-mono text-[12.5px] leading-relaxed text-gray-300"><span class="text-violet-glow">SELECT</span> region,
+  <span class="text-cyan-glow">SUM</span>(revenue) <span class="text-violet-glow">AS</span> total
+<span class="text-violet-glow">FROM</span> sales
+<span class="text-violet-glow">WHERE</span> qtr = <span class="text-green-400">'Q4'</span>
+<span class="text-violet-glow">GROUP BY</span> region
+<span class="text-violet-glow">ORDER BY</span> total <span class="text-violet-glow">DESC</span>;</pre>
+              <div class="mt-5 pt-4 border-t border-gray-800 flex items-center gap-2 text-[11px] font-mono text-gray-500">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                6 rows returned · 12ms
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- scroll cue -->
+      <a href="#about" aria-label="Scroll to About section" class="absolute bottom-8 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2 text-gray-600 hover:text-gray-400 transition-colors">
+        <span class="font-mono text-[10px] tracking-widest uppercase">scroll</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+      </a>
+    </section>
+
+    <!-- Tool marquee strip -->
+    <div class="marquee-wrap border-y border-gray-800/80 bg-base-soft/40 py-5 overflow-hidden">
+      <div class="marquee-track flex gap-16 w-max font-mono text-sm text-gray-600 whitespace-nowrap">
+        <span class="flex gap-16">
+          <span>SQL</span><span>Python</span><span>Power BI</span><span>Excel</span><span>AWS</span><span>Azure</span><span>dbt</span><span>Docker</span><span>Pandas</span><span>NumPy</span><span>Git</span>
+        </span>
+        <span class="flex gap-16" aria-hidden="true">
+          <span>SQL</span><span>Python</span><span>Power BI</span><span>Excel</span><span>AWS</span><span>Azure</span><span>dbt</span><span>Docker</span><span>Pandas</span><span>NumPy</span><span>Git</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         ABOUT SECTION
+         ============================================================ -->
+    <section id="about" class="py-28 px-6 lg:px-10">
+      <div class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-14 items-start">
+        <div class="lg:col-span-4 reveal">
+          <p class="eyebrow mb-4">about</p>
+          <h2 class="font-display text-3xl sm:text-4xl font-semibold text-white leading-tight">
+            I work where messy data meets a clear answer.
+          </h2>
+        </div>
+
+        <div class="lg:col-span-8 reveal reveal-delay-1">
+          <p class="text-gray-400 text-lg leading-relaxed">
+            I'm a Data Analyst working across <span class="text-white">SQL, Python, Power BI, and Excel</span> — with hands-on experience in predictive ML modelling, NLP sentiment analysis, dashboard development, and reporting automation. Most recently, I worked as a Data Analyst Intern at <span class="text-white">CODTECH IT Solutions</span>, where I delivered an end-to-end analytics pipeline — building a regression model (MAE: 0.89), a Power BI dashboard tracking $4,827 in revenue, and an NLP sentiment classifier using TextBlob.
+          </p>
+          <p class="mt-5 text-gray-400 text-lg leading-relaxed">
+            I'm currently finishing my <span class="text-white">B.Tech in Electronics & Communication Engineering</span> at UIET, CSJM University Kanpur (2022–2026), and backing that up with certifications from Google, IBM, and Coursera. Outside of data, I've competed at the district level in Taekwondo and served as Placement Coordinator and General Secretary of my hostel — both taught me a lot about organizing under pressure, which turns out to translate well to messy datasets.
+          </p>
+
+          <div class="mt-7">
+            <a href="Bhavya_Trivedi_Resume.pdf" target="_blank" rel="noopener"
+               class="btn-ghost inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-gray-700 text-gray-100 font-medium text-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16"/></svg>
+              Download Resume
+            </a>
+          </div>
+
+          <!-- mini credibility cards -->
+          <div class="mt-10 grid sm:grid-cols-3 gap-5">
+            <div class="glass rounded-2xl p-5 lift-card">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-cyan-glow mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2a4 4 0 014-4h4M9 17H7a2 2 0 01-2-2V9a2 2 0 012-2h2m0 10V7m0 0h6"/></svg>
+              <h3 class="text-white font-semibold text-sm">Dashboards & Reporting</h3>
+              <p class="text-gray-500 text-xs mt-1.5 leading-relaxed">MIS reports and Power BI/Excel dashboards tracking 8+ KPIs at a time.</p>
+            </div>
+            <div class="glass rounded-2xl p-5 lift-card">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-glow mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              <h3 class="text-white font-semibold text-sm">SQL & Python Analysis</h3>
+              <p class="text-gray-500 text-xs mt-1.5 leading-relaxed">Extracting and analyzing structured datasets to surface real trends.</p>
+            </div>
+            <div class="glass rounded-2xl p-5 lift-card">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-violet-glow mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <h3 class="text-white font-semibold text-sm">Data Validation</h3>
+              <p class="text-gray-500 text-xs mt-1.5 leading-relaxed">Performing checks to keep reporting accurate and consistent.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SKILLS SECTION
+         ============================================================ -->
+    <section id="skills" class="py-28 px-6 lg:px-10 bg-base-soft/40 border-y border-gray-800/60">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center max-w-2xl mx-auto reveal">
+          <p class="eyebrow justify-center mb-4 inline-flex">skills</p>
+          <h2 class="font-display text-3xl sm:text-4xl font-semibold text-white">The stack behind the analysis</h2>
+          <p class="mt-4 text-gray-400">Core analytical tools, the languages I think in, and the cloud & ops layer that gets data ready for them.</p>
+        </div>
+
+        <!-- Core skills: animated proficiency bars -->
+        <div class="mt-16 grid lg:grid-cols-2 gap-x-16 gap-y-7 reveal reveal-delay-1">
+          <div data-skill-bar data-level="88">
+            <div class="flex justify-between items-baseline mb-2">
+              <span class="text-sm font-medium text-gray-200">SQL</span>
+              <span class="font-mono text-xs text-gray-500"><span class="skill-level">0</span>%</span>
+            </div>
+            <div class="h-2 rounded-full bg-gray-800 overflow-hidden">
+              <div class="skill-bar-fill h-full rounded-full bg-gradient-to-r from-indigo-glow to-cyan-glow"></div>
+            </div>
+          </div>
+          <div data-skill-bar data-level="90">
+            <div class="flex justify-between items-baseline mb-2">
+              <span class="text-sm font-medium text-gray-200">Excel</span>
+              <span class="font-mono text-xs text-gray-500"><span class="skill-level">0</span>%</span>
+            </div>
+            <div class="h-2 rounded-full bg-gray-800 overflow-hidden">
+              <div class="skill-bar-fill h-full rounded-full bg-gradient-to-r from-indigo-glow to-cyan-glow"></div>
+            </div>
+          </div>
+          <div data-skill-bar data-level="86">
+            <div class="flex justify-between items-baseline mb-2">
+              <span class="text-sm font-medium text-gray-200">Power BI</span>
+              <span class="font-mono text-xs text-gray-500"><span class="skill-level">0</span>%</span>
+            </div>
+            <div class="h-2 rounded-full bg-gray-800 overflow-hidden">
+              <div class="skill-bar-fill h-full rounded-full bg-gradient-to-r from-indigo-glow to-cyan-glow"></div>
+            </div>
+          </div>
+          <div data-skill-bar data-level="78">
+            <div class="flex justify-between items-baseline mb-2">
+              <span class="text-sm font-medium text-gray-200">Python</span>
+              <span class="font-mono text-xs text-gray-500"><span class="skill-level">0</span>%</span>
+            </div>
+            <div class="h-2 rounded-full bg-gray-800 overflow-hidden">
+              <div class="skill-bar-fill h-full rounded-full bg-gradient-to-r from-indigo-glow to-cyan-glow"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tools & Cloud: categorized badge grid -->
+        <div class="mt-20 grid md:grid-cols-3 gap-6">
+
+          <div class="glass rounded-2xl p-7 reveal reveal-delay-1 lift-card">
+            <h3 class="font-display text-base font-semibold text-white mb-1">Analysis & Libraries</h3>
+            <p class="text-xs text-gray-500 mb-5">Day-to-day workhorses</p>
+            <div class="flex flex-wrap gap-2">
+              <span class="skill-badge">Pandas</span>
+              <span class="skill-badge">NumPy</span>
+              <span class="skill-badge">Matplotlib</span>
+              <span class="skill-badge">DAX</span>
+              <span class="skill-badge">Data Cleaning</span>
+              <span class="skill-badge">Data Visualization</span>
+            </div>
+          </div>
+
+          <div class="glass rounded-2xl p-7 reveal reveal-delay-2 lift-card">
+            <h3 class="font-display text-base font-semibold text-white mb-1">Cloud & Infrastructure</h3>
+            <p class="text-xs text-gray-500 mb-5">What I'm learning next</p>
+            <div class="flex flex-wrap gap-2">
+              <span class="skill-badge">AWS</span>
+              <span class="skill-badge">Azure</span>
+              <span class="skill-badge">DBT</span>
+              <span class="skill-badge">Docker</span>
+              <span class="skill-badge">Data Warehousing</span>
+              <span class="skill-badge">ETL Pipelines</span>
+            </div>
+          </div>
+
+          <div class="glass rounded-2xl p-7 reveal reveal-delay-3 lift-card">
+            <h3 class="font-display text-base font-semibold text-white mb-1">Workflow & Delivery</h3>
+            <p class="text-xs text-gray-500 mb-5">How work ships & repeats</p>
+            <div class="flex flex-wrap gap-2">
+              <span class="skill-badge">Git & GitHub</span>
+              <span class="skill-badge">APIs</span>
+              <span class="skill-badge">Automation</span>
+              <span class="skill-badge">PivotTables</span>
+              <span class="skill-badge">XLOOKUP</span>
+              <span class="skill-badge">Power Query</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PROJECTS SECTION — populated live from GitHub API
+         ============================================================ -->
+    <section id="projects" class="py-28 px-6 lg:px-10">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 reveal">
+          <div class="max-w-xl">
+            <p class="eyebrow mb-4">projects</p>
+            <h2 class="font-display text-3xl sm:text-4xl font-semibold text-white">Pulled straight from GitHub</h2>
+            <p class="mt-4 text-gray-400">This grid fetches live from <span class="font-mono text-gray-300">github.com/Bhavya172004</span> — what you see is the current repo list, not a snapshot.</p>
+          </div>
+          <a href="https://github.com/Bhavya172004?tab=repositories" target="_blank" rel="noopener"
+             class="btn-ghost shrink-0 inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-gray-700 text-gray-100 font-medium text-sm self-start sm:self-auto">
+            All repositories ↗
+          </a>
+        </div>
+
+        <!-- Featured projects, drawn directly from resume -->
+        <div class="mt-12 grid md:grid-cols-2 gap-6 reveal reveal-delay-1">
+          <div class="lift-card glass-strong rounded-2xl p-7 flex flex-col">
+            <span class="eyebrow mb-3 inline-flex w-fit">featured · internship</span>
+            <h3 class="font-display text-xl font-semibold text-white">End-to-End Restaurant Analytics Pipeline</h3>
+            <p class="text-sm text-gray-400 mt-3 leading-relaxed flex-1">
+              Delivered a complete analytics pipeline on restaurant sales data — built a Linear Regression model achieving MAE of 0.89 to predict tip amounts, designed a Power BI dashboard tracking $4,827 total revenue across day, gender, and smoking segments, and implemented NLP sentiment analysis using TextBlob to classify customer feedback polarity.
+            </p>
+            <div class="flex flex-wrap gap-1.5 mt-5">
+              <span class="font-mono text-[10px] px-2 py-1 rounded-md bg-indigo-glow/10 text-indigo-300 border border-indigo-glow/20">Python</span>
+              <span class="font-mono text-[10px] px-2 py-1 rounded-md bg-indigo-glow/10 text-indigo-300 border border-indigo-glow/20">Scikit-learn</span>
+              <span class="font-mono text-[10px] px-2 py-1 rounded-md bg-indigo-glow/10 text-indigo-300 border border-indigo-glow/20">Power BI</span>
+              <span class="font-mono text-[10px] px-2 py-1 rounded-md bg-indigo-glow/10 text-indigo-300 border border-indigo-glow/20">NLP · TextBlob</span>
+            </div>
+            <a href="https://github.com/Bhavya172004/Codtech-data-analysis-internship" target="_blank" rel="noopener" class="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-cyan-glow hover:text-cyan-300 transition-colors">
+              View on GitHub
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M7 7h10v10"/></svg>
+            </a>
+          </div>
+
+          <div class="lift-card glass-strong rounded-2xl p-7 flex flex-col">
+            <span class="eyebrow mb-3 inline-flex w-fit">featured</span>
+            <h3 class="font-display text-xl font-semibold text-white">Customer Segmentation Analysis</h3>
+            <p class="text-sm text-gray-400 mt-3 leading-relaxed flex-1">
+              Cleaned and analyzed 10,000+ customer records in Python to identify high-value segments by purchase behavior. Built an interactive Power BI dashboard with KPI metrics, slicers, and regional sales trends to support targeted business decision-making.
+            </p>
+            <div class="flex flex-wrap gap-1.5 mt-5">
+              <span class="font-mono text-[10px] px-2 py-1 rounded-md bg-indigo-glow/10 text-indigo-300 border border-indigo-glow/20">Python</span>
+              <span class="font-mono text-[10px] px-2 py-1 rounded-md bg-indigo-glow/10 text-indigo-300 border border-indigo-glow/20">Power BI</span>
+              <span class="font-mono text-[10px] px-2 py-1 rounded-md bg-indigo-glow/10 text-indigo-300 border border-indigo-glow/20">Data Cleaning</span>
+            </div>
+            <a href="https://github.com/Bhavya172004" target="_blank" rel="noopener" class="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-cyan-glow hover:text-cyan-300 transition-colors">
+              View on GitHub
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M7 7h10v10"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <p class="mt-16 font-mono text-xs text-gray-600 reveal reveal-delay-2">more from the repo list ↓</p>
+
+        <!-- status line -->
+        <p id="repo-status" class="mt-3 font-mono text-xs text-gray-600 reveal reveal-delay-2">fetching repositories…</p>
+
+        <div id="projects-grid" class="mt-5 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Skeleton placeholders shown while fetching -->
+          <div class="skeleton-card glass rounded-2xl p-6 h-[220px]">
+            <div class="skeleton h-5 w-2/3 rounded mb-4"></div>
+            <div class="skeleton h-3 w-full rounded mb-2"></div>
+            <div class="skeleton h-3 w-5/6 rounded mb-6"></div>
+            <div class="skeleton h-3 w-1/3 rounded"></div>
+          </div>
+          <div class="skeleton-card glass rounded-2xl p-6 h-[220px]">
+            <div class="skeleton h-5 w-2/3 rounded mb-4"></div>
+            <div class="skeleton h-3 w-full rounded mb-2"></div>
+            <div class="skeleton h-3 w-5/6 rounded mb-6"></div>
+            <div class="skeleton h-3 w-1/3 rounded"></div>
+          </div>
+          <div class="skeleton-card glass rounded-2xl p-6 h-[220px]">
+            <div class="skeleton h-5 w-2/3 rounded mb-4"></div>
+            <div class="skeleton h-3 w-full rounded mb-2"></div>
+            <div class="skeleton h-3 w-5/6 rounded mb-6"></div>
+            <div class="skeleton h-3 w-1/3 rounded"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         EXPERIENCE / LEARNING JOURNEY — Timeline
+         ============================================================ -->
+    <section id="journey" class="py-28 px-6 lg:px-10 bg-base-soft/40 border-y border-gray-800/60">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center max-w-2xl mx-auto reveal">
+          <p class="eyebrow justify-center mb-4 inline-flex">journey</p>
+          <h2 class="font-display text-3xl sm:text-4xl font-semibold text-white">Experience & Education</h2>
+          <p class="mt-4 text-gray-400">The real timeline — degree, certifications, and the internship that put it into practice.</p>
+        </div>
+
+        <div class="mt-20 relative pl-10 sm:pl-0">
+          <!-- vertical line -->
+          <div class="timeline-line absolute left-[7px] sm:left-1/2 top-0 bottom-0 w-px sm:-translate-x-1/2"></div>
+
+          <div class="space-y-14">
+
+            <div class="relative reveal sm:grid sm:grid-cols-2 sm:gap-10">
+              <span class="timeline-dot absolute left-0 sm:left-1/2 top-1.5 -translate-x-1/2 w-3 h-3 rounded-full bg-cyan-glow"></span>
+              <div class="sm:text-right sm:pr-10">
+                <p class="font-mono text-xs text-cyan-glow mb-1">2022 — 2026</p>
+                <h3 class="text-white font-semibold text-lg">B.Tech, Electronics & Communication Engineering</h3>
+                <p class="text-gray-500 text-sm mt-2 leading-relaxed">UIET, CSJM University Kanpur · CGPA 6.15. Also served as Placement Coordinator and General Secretary of the Girls Hostel, organizing events for 500+ participants.</p>
+              </div>
+              <div class="hidden sm:block"></div>
+            </div>
+
+            <div class="relative reveal sm:grid sm:grid-cols-2 sm:gap-10">
+              <span class="timeline-dot absolute left-0 sm:left-1/2 top-1.5 -translate-x-1/2 w-3 h-3 rounded-full bg-indigo-glow"></span>
+              <div class="hidden sm:block"></div>
+              <div class="sm:pl-10">
+                <p class="font-mono text-xs text-indigo-glow mb-1">Certifications</p>
+                <h3 class="text-white font-semibold text-lg">Google & IBM Data Analytics, SQL for Data Science</h3>
+                <p class="text-gray-500 text-sm mt-2 leading-relaxed">Google Data Analytics Professional Certificate, IBM Data Analyst Professional Certificate, and SQL for Data Science — all via Coursera — alongside Advanced Excel and Power BI Essential Training.</p>
+              </div>
+            </div>
+
+            <div class="relative reveal sm:grid sm:grid-cols-2 sm:gap-10">
+              <span class="timeline-dot absolute left-0 sm:left-1/2 top-1.5 -translate-x-1/2 w-3 h-3 rounded-full bg-violet-glow"></span>
+              <div class="sm:text-right sm:pr-10">
+                <p class="font-mono text-xs text-violet-glow mb-1">March — April 2026</p>
+                <h3 class="text-white font-semibold text-lg">Data Analyst Intern, CODTECH IT Solutions</h3>
+                <p class="text-gray-500 text-sm mt-2 leading-relaxed">Extracted and analyzed structured datasets with SQL and Python, built a Linear Regression model (MAE: 0.89), designed a Power BI dashboard tracking $4,827 in revenue across 244 records, implemented NLP sentiment analysis using TextBlob, and automated MIS reporting workflows using Pandas.</p>
+              </div>
+              <div class="hidden sm:block"></div>
+            </div>
+
+            <div class="relative reveal sm:grid sm:grid-cols-2 sm:gap-10">
+              <span class="timeline-dot absolute left-0 sm:left-1/2 top-1.5 -translate-x-1/2 w-3 h-3 rounded-full bg-cyan-glow"></span>
+              <div class="hidden sm:block"></div>
+              <div class="sm:pl-10">
+                <p class="font-mono text-xs text-cyan-glow mb-1">Achievements</p>
+                <h3 class="text-white font-semibold text-lg">Reliance Foundation Scholar</h3>
+                <p class="text-gray-500 text-sm mt-2 leading-relaxed">Selected as a Reliance Foundation Scholar. Also competed as a district-level Taekwondo player.</p>
+              </div>
+            </div>
+
+            <div class="relative reveal sm:grid sm:grid-cols-2 sm:gap-10">
+              <span class="timeline-dot absolute left-0 sm:left-1/2 top-1.5 -translate-x-1/2 w-3 h-3 rounded-full bg-indigo-glow"></span>
+              <div class="sm:text-right sm:pr-10">
+                <p class="font-mono text-xs text-indigo-glow mb-1">Now</p>
+                <h3 class="text-white font-semibold text-lg">Open to Data Analyst Roles</h3>
+                <p class="text-gray-500 text-sm mt-2 leading-relaxed">Graduating in 2026 and looking for full-time analyst opportunities — bringing SQL, Python, Excel, and Power BI to a team that needs clear answers from messy data.</p>
+              </div>
+              <div class="hidden sm:block"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         CONTACT SECTION
+         ============================================================ -->
+    <section id="contact" class="py-28 px-6 lg:px-10">
+      <div class="max-w-4xl mx-auto text-center reveal">
+        <p class="eyebrow justify-center mb-4 inline-flex">contact</p>
+        <h2 class="font-display text-3xl sm:text-5xl font-semibold text-white leading-tight">
+          Have a dataset that needs <span class="gradient-text">a story?</span>
+        </h2>
+        <p class="mt-5 text-gray-400 text-lg max-w-lg mx-auto">
+          I'm open to analyst roles, internships, and freelance dashboard work. Reach out — I read everything.
+        </p>
+
+        <div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-5 text-left">
+          <a href="mailto:bhavyatrivediofficial@gmail.com" class="glass rounded-2xl p-6 lift-card group">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-cyan-glow mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <p class="text-xs text-gray-500 mb-1">Email</p>
+            <p class="text-white font-medium text-sm break-all group-hover:text-cyan-glow transition-colors">bhavyatrivediofficial@gmail.com</p>
+          </a>
+
+          <a href="tel:+918318757824" class="glass rounded-2xl p-6 lift-card group">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-cyan-glow mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+            <p class="text-xs text-gray-500 mb-1">Phone</p>
+            <p class="text-white font-medium text-sm group-hover:text-cyan-glow transition-colors">+91 83187 57824</p>
+          </a>
+
+          <a href="https://www.linkedin.com/in/bhavya-trivedi-34114725b/" target="_blank" rel="noopener" class="glass rounded-2xl p-6 lift-card group">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-glow mb-4" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.58c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.15 1.45-2.15 2.94v5.68H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.27 2.38 4.27 5.47v6.27zM5.34 7.43a2.07 2.07 0 110-4.13 2.07 2.07 0 010 4.13zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+            <p class="text-xs text-gray-500 mb-1">LinkedIn</p>
+            <p class="text-white font-medium text-sm group-hover:text-indigo-glow transition-colors">Bhavya Trivedi ↗</p>
+          </a>
+
+          <a href="https://github.com/Bhavya172004" target="_blank" rel="noopener" class="glass rounded-2xl p-6 lift-card group">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-violet-glow mb-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.27-.01-1-.02-1.96-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.24 2.75.12 3.04.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.15 0 1.55-.01 2.8-.01 3.18 0 .31.21.67.8.56A10.52 10.52 0 0 0 23.5 12c0-6.35-5.15-11.5-11.5-11.5z"/></svg>
+            <p class="text-xs text-gray-500 mb-1">GitHub</p>
+            <p class="text-white font-medium text-sm group-hover:text-violet-glow transition-colors">Bhavya172004 ↗</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="border-t border-gray-800/60 py-10 px-6 lg:px-10 relative z-10">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
+      <p>© <span id="year"></span> Bhavya. Built with curiosity and clean queries.</p>
+      <p class="font-mono text-xs">SELECT * FROM growth WHERE mindset = 'open';</p>
+    </div>
+  </footer>
+
+  <!-- Back to top -->
+  <button id="back-to-top" aria-label="Back to top"
+    class="fixed bottom-7 right-7 z-50 w-11 h-11 rounded-full glass-strong flex items-center justify-center text-gray-300 opacity-0 invisible">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+  </button>
+
+  <style>
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
+    .skill-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      padding: 0.4rem 0.7rem;
+      border-radius: 0.5rem;
+      background: rgba(99,102,241,0.08);
+      border: 1px solid rgba(99,102,241,0.18);
+      color: #C7D2FE;
+      transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+    }
+    .skill-badge:hover {
+      background: rgba(34,211,238,0.1);
+      border-color: rgba(34,211,238,0.35);
+      transform: translateY(-2px);
+      cursor: default;
+    }
+  </style>
+
+  <script>
+    /* ============================================================
+       LOADER — hide once DOM is ready (min display time for polish)
+       ============================================================ */
+    window.addEventListener('load', () => {
+      const loader = document.getElementById('loader');
+      setTimeout(() => loader.classList.add('hidden'), 500);
+    });
+
+    /* ============================================================
+       FOOTER YEAR
+       ============================================================ */
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    /* ============================================================
+       SCROLL PROGRESS BAR
+       ============================================================ */
+    const progressBar = document.getElementById('scroll-progress');
+    function updateProgress() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressBar.style.width = pct + '%';
+    }
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+
+    /* ============================================================
+       NAVBAR: background on scroll + active link highlighting
+       ============================================================ */
+    const navbar = document.getElementById('navbar');
+    const sections = document.querySelectorAll('main section[id]');
+    const navLinks = document.querySelectorAll('[data-nav]');
+
+    function onScroll() {
+      navbar.classList.toggle('scrolled', window.scrollY > 24);
+
+      let currentId = '';
+      sections.forEach(sec => {
+        const rect = sec.getBoundingClientRect();
+        if (rect.top <= 120 && rect.bottom >= 120) currentId = sec.id;
+      });
+      navLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + currentId);
+      });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    /* ============================================================
+       MOBILE MENU TOGGLE
+       ============================================================ */
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const iconOpen = document.getElementById('icon-open');
+    const iconClose = document.getElementById('icon-close');
+
+    menuToggle.addEventListener('click', () => {
+      const isOpen = !mobileMenu.classList.contains('hidden');
+      mobileMenu.classList.toggle('hidden');
+      iconOpen.classList.toggle('hidden');
+      iconClose.classList.toggle('hidden');
+      menuToggle.setAttribute('aria-expanded', String(!isOpen));
+    });
+    document.querySelectorAll('#mobile-menu [data-nav]').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+        iconOpen.classList.remove('hidden');
+        iconClose.classList.add('hidden');
+        menuToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    /* ============================================================
+       BACK TO TOP BUTTON
+       ============================================================ */
+    const backToTop = document.getElementById('back-to-top');
+    window.addEventListener('scroll', () => {
+      const show = window.scrollY > 600;
+      backToTop.classList.toggle('opacity-0', !show);
+      backToTop.classList.toggle('invisible', !show);
+    }, { passive: true });
+    backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    /* ============================================================
+       HERO TYPING EFFECT
+       ============================================================ */
+    const roles = [
+      'role --title "Data Analyst"',
+      'skills --add "SQL, Python, Power BI"',
+      'pipeline --status "cleaning data..."',
+      'mindset --set "curious, precise, calm"',
+    ];
+    const typedEl = document.getElementById('typed-role');
+    let roleIdx = 0, charIdx = 0, deleting = false;
+
+    function typeLoop() {
+      const current = roles[roleIdx];
+      if (!deleting) {
+        charIdx++;
+        typedEl.textContent = current.slice(0, charIdx);
+        if (charIdx === current.length) {
+          deleting = true;
+          setTimeout(typeLoop, 1600);
+          return;
+        }
+      } else {
+        charIdx--;
+        typedEl.textContent = current.slice(0, charIdx);
+        if (charIdx === 0) {
+          deleting = false;
+          roleIdx = (roleIdx + 1) % roles.length;
+        }
+      }
+      setTimeout(typeLoop, deleting ? 28 : 42);
+    }
+    typeLoop();
+
+    /* ============================================================
+       SCROLL REVEAL (IntersectionObserver, fade-up)
+       ============================================================ */
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    revealEls.forEach(el => revealObserver.observe(el));
+
+    /* ============================================================
+       SKILL BARS: animate fill width when scrolled into view
+       ============================================================ */
+    const skillBars = document.querySelectorAll('[data-skill-bar]');
+    const skillObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const wrap = entry.target;
+          const level = wrap.getAttribute('data-level');
+          const fill = wrap.querySelector('.skill-bar-fill');
+          const label = wrap.querySelector('.skill-level');
+          fill.style.width = level + '%';
+          // Animate the numeric label counting up
+          let count = 0;
+          const target = parseInt(level, 10);
+          const step = Math.max(1, Math.round(target / 40));
+          const counter = setInterval(() => {
+            count += step;
+            if (count >= target) { count = target; clearInterval(counter); }
+            label.textContent = count;
+          }, 20);
+          skillObserver.unobserve(wrap);
+        }
+      });
+    }, { threshold: 0.4 });
+    skillBars.forEach(el => skillObserver.observe(el));
+
+    /* ============================================================
+       GITHUB PROJECTS — live fetch from GitHub REST API
+       Falls back to a curated static set if the API call fails
+       (rate limit, offline, network restrictions, etc.)
+       ============================================================ */
+    const GITHUB_USERNAME = 'Bhavya172004';
+    const projectsGrid = document.getElementById('projects-grid');
+    const repoStatus = document.getElementById('repo-status');
+    const statRepos = document.getElementById('stat-repos');
+
+    const LANGUAGE_COLORS = {
+      Python: '#3572A5', 'Jupyter Notebook': '#DA5B0B', SQL: '#E38C00',
+      JavaScript: '#F1E05A', HTML: '#E34C26', CSS: '#563D7C',
+      'Power Query': '#7E57C2', R: '#198CE7', Java: '#B07219',
+      TypeScript: '#3178C6', Shell: '#89E051', Default: '#6366F1',
+    };
+
+    function langColor(lang) {
+      return LANGUAGE_COLORS[lang] || LANGUAGE_COLORS.Default;
+    }
+
+    function timeAgo(dateStr) {
+      const diff = Date.now() - new Date(dateStr).getTime();
+      const days = Math.floor(diff / 86400000);
+      if (days < 1) return 'today';
+      if (days < 30) return days + 'd ago';
+      const months = Math.floor(days / 30);
+      if (months < 12) return months + 'mo ago';
+      return Math.floor(months / 12) + 'y ago';
+    }
+
+    function projectCardHTML(repo) {
+      const desc = repo.description || 'A data project exploring real-world datasets — see the README for full details.';
+      const lang = repo.language || 'Data';
+      const topics = (repo.topics && repo.topics.length) ? repo.topics.slice(0, 3) : [];
+      return `
+        <a href="${repo.html_url}" target="_blank" rel="noopener"
+           class="lift-card glass rounded-2xl p-6 flex flex-col group">
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <h3 class="font-display text-lg font-semibold text-white group-hover:text-cyan-glow transition-colors break-words">
+              ${repo.name}
+            </h3>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600 shrink-0 mt-1 group-hover:text-cyan-glow group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M7 7h10v10"/></svg>
+          </div>
+          <p class="text-sm text-gray-500 leading-relaxed flex-1 line-clamp-3">${desc}</p>
+          ${topics.length ? `
+          <div class="flex flex-wrap gap-1.5 mt-4">
+            ${topics.map(t => `<span class="font-mono text-[10px] px-2 py-1 rounded-md bg-indigo-glow/10 text-indigo-300 border border-indigo-glow/20">${t}</span>`).join('')}
+          </div>` : ''}
+          <div class="flex items-center gap-4 mt-5 pt-4 border-t border-gray-800 text-xs text-gray-500">
+            <span class="inline-flex items-center gap-1.5">
+              <span class="lang-dot" style="background:${langColor(lang)}"></span>${lang}
+            </span>
+            <span class="inline-flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              ${repo.stargazers_count}
+            </span>
+            <span class="ml-auto font-mono">${timeAgo(repo.pushed_at)}</span>
+          </div>
+        </a>`;
+    }
+
+    // Curated fallback projects (shown only if the live API call fails)
+    const FALLBACK_PROJECTS = [
+      {
+        name: 'Sales-Performance-Dashboard', html_url: `https://github.com/${GITHUB_USERNAME}`,
+        description: 'Interactive Power BI dashboard analyzing regional sales trends, built on a cleaned multi-year retail dataset.',
+        language: 'Power Query', stargazers_count: 0, pushed_at: new Date().toISOString(), topics: ['power-bi','dashboard'],
+      },
+      {
+        name: 'ETL-Pipeline-AWS', html_url: `https://github.com/${GITHUB_USERNAME}`,
+        description: 'A small ETL pipeline that ingests raw CSVs, transforms them with Python, and lands them in a warehouse on AWS.',
+        language: 'Python', stargazers_count: 0, pushed_at: new Date().toISOString(), topics: ['etl','aws'],
+      },
+      {
+        name: 'SQL-Data-Cleaning-Toolkit', html_url: `https://github.com/${GITHUB_USERNAME}`,
+        description: 'Reusable SQL scripts for deduplication, null-handling, and schema validation across messy source tables.',
+        language: 'SQL', stargazers_count: 0, pushed_at: new Date().toISOString(), topics: ['sql','data-cleaning'],
+      },
+      {
+        name: 'EDA-Customer-Churn', html_url: `https://github.com/${GITHUB_USERNAME}`,
+        description: 'Exploratory data analysis on a customer churn dataset using Pandas, NumPy, and Seaborn for visualization.',
+        language: 'Jupyter Notebook', stargazers_count: 0, pushed_at: new Date().toISOString(), topics: ['pandas','eda'],
+      },
+      {
+        name: 'dbt-Warehouse-Models', html_url: `https://github.com/${GITHUB_USERNAME}`,
+        description: 'Layered dbt models (staging → marts) over a sample warehouse, with tests for data quality at each layer.',
+        language: 'SQL', stargazers_count: 0, pushed_at: new Date().toISOString(), topics: ['dbt','warehousing'],
+      },
+      {
+        name: 'API-Automation-Scripts', html_url: `https://github.com/${GITHUB_USERNAME}`,
+        description: 'Python scripts that pull data from public APIs on a schedule and append clean records to a tracking sheet.',
+        language: 'Python', stargazers_count: 0, pushed_at: new Date().toISOString(), topics: ['api','automation'],
+      },
+    ];
+
+    function renderProjects(repos, isLive) {
+      projectsGrid.innerHTML = repos.map(projectCardHTML).join('');
+      repoStatus.innerHTML = isLive
+        ? `<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>live from GitHub API · ${repos.length} repositories shown</span>`
+        : `<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span>showing cached project list (GitHub API unavailable right now)</span>`;
+    }
+
+    async function loadProjects() {
+      try {
+        const res = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=100`);
+        if (!res.ok) throw new Error('GitHub API error: ' + res.status);
+        let repos = await res.json();
+        if (!Array.isArray(repos)) throw new Error('Unexpected API response');
+
+        statRepos.textContent = repos.length;
+
+        // Filter out forks with no description, prioritize originals, sort by recency
+        repos = repos
+          .filter(r => !r.fork || r.description)
+          .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at))
+          .slice(0, 6);
+
+        if (repos.length === 0) throw new Error('No public repositories found');
+        renderProjects(repos, true);
+      } catch (err) {
+        console.warn('Falling back to cached projects:', err.message);
+        statRepos.textContent = '6+';
+        renderProjects(FALLBACK_PROJECTS, false);
+      }
+    }
+    loadProjects();
+  </script>
+</body>
+</html>
